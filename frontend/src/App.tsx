@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import AuthModal from './components/AuthModal';
@@ -60,6 +59,22 @@ function AppContent() {
   const [isAppMode, setIsAppMode] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+
+  // Force close modal on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isAuthModalOpen) {
+        setIsAuthModalOpen(false);
+      }
+      // Force close with Ctrl+Escape
+      if (e.key === 'Escape' && e.ctrlKey) {
+        setIsAuthModalOpen(false);
+        setIsAppMode(false);
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isAuthModalOpen]);
 
   // Core application states
   const [reports, setReports] = useState<MedicalReport[]>([]);
@@ -226,45 +241,11 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-darker font-sans text-slate-800 selection:bg-teal-500 selection:text-white relative overflow-hidden">
-      {/* Background ambient glowing circles */}
-      <motion.div 
-        animate={{
-          x: [0, 90, -50, 0],
-          y: [0, -80, 60, 0],
-        }}
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="glow-circle w-[600px] h-[600px] bg-teal-300/15 top-[-150px] left-[-150px]"
-      />
-      <motion.div 
-        animate={{
-          x: [0, -100, 70, 0],
-          y: [0, 90, -70, 0],
-        }}
-        transition={{
-          duration: 26,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="glow-circle w-[700px] h-[700px] bg-purple-300/12 bottom-[-250px] right-[-250px]"
-      />
-      <motion.div 
-        animate={{
-          x: [0, 50, -60, 0],
-          y: [0, 70, -40, 0],
-          scale: [1, 1.1, 0.95, 1],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="glow-circle w-[500px] h-[500px] bg-blue-300/8 top-[35%] left-[45%] -translate-x-1/2 -translate-y-1/2"
-      />
+    <div className="min-h-screen bg-brand-darker font-sans text-slate-800 selection:bg-teal-500 selection:text-white relative overflow-x-hidden">
+      {/* Background ambient glowing circles - static */}
+      <div className="glow-circle w-[600px] h-[600px] bg-teal-300/15 top-[-150px] left-[-150px]" />
+      <div className="glow-circle w-[700px] h-[700px] bg-purple-300/12 bottom-[-250px] right-[-250px]" />
+      <div className="glow-circle w-[500px] h-[500px] bg-blue-300/8 top-[35%] left-[45%] -translate-x-1/2 -translate-y-1/2" />
 
       {/* Sandbox indicator banner */}
       {isSandbox && user && (
@@ -299,6 +280,16 @@ function AppContent() {
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={() => setIsAppMode(true)}
       />
+
+      {/* Emergency close button for stuck modal */}
+      {isAuthModalOpen && (
+        <button
+          onClick={() => setIsAuthModalOpen(false)}
+          className="fixed bottom-4 right-4 z-[100] bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg cursor-pointer text-sm font-semibold"
+        >
+          Close Modal (Emergency)
+        </button>
+      )}
     </div>
   );
 }

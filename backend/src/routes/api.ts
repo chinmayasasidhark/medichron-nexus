@@ -197,7 +197,7 @@ router.post('/chat', async (req: AuthenticatedRequest, res: Response) => {
   if (apiKey) {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+      const modelName = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
       const model = genAI.getGenerativeModel({ model: modelName });
       
       // System Prompt supplying the LLM with user context
@@ -221,11 +221,13 @@ Instructions:
 3. If they ask about symptoms, give supportive information but remind them to consult their doctor for clinical diagnoses.
 4. Keep answers concise and readable. Use markdown formatting.`;
 
-      // Format history for Gemini
-      const historyList = userData.chatHistory.map(msg => ({
-        role: msg.sender === 'user' ? 'user' as const : 'model' as const,
-        parts: [{ text: msg.text }]
-      }));
+      // Format history for Gemini (filter out initial AI welcome message)
+      const historyList = userData.chatHistory
+        .filter(msg => msg.sender !== 'ai' || userData.chatHistory.indexOf(msg) > 0)
+        .map(msg => ({
+          role: msg.sender === 'user' ? 'user' as const : 'model' as const,
+          parts: [{ text: msg.text }]
+        }));
 
       const chat = model.startChat({
         history: historyList,

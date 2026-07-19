@@ -271,7 +271,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="w-full max-w-7xl mx-auto px-6 py-6 relative z-10 min-h-screen flex flex-col">
       {/* Header Bar */}
-      <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-200 sticky top-0 bg-brand-darker/95 backdrop-blur-md z-50">
         <div className="flex items-center gap-3">
           <motion.button 
             onClick={onExitApp}
@@ -319,7 +319,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       </header>
 
       {/* Main Content Area with Tab Transitions */}
-      <main className="flex-1 py-8 overflow-hidden">
+      <main className="flex-1 py-8">
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' && (
             <motion.div 

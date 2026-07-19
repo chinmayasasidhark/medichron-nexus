@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, User, Activity, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User, Activity, AlertCircle, ArrowRight, ShieldCheck, X } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,6 +17,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
   const [displayName, setDisplayName] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+
+  // Close modal on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +95,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-slate-950/65 backdrop-blur-md"
+          className="absolute inset-0 bg-slate-950/65 backdrop-blur-md cursor-pointer"
         />
 
         {/* Modal body */}
@@ -95,6 +106,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
           transition={{ type: 'spring', damping: 20, stiffness: 260 }}
           className="relative w-full max-w-md overflow-hidden rounded-3xl bg-slate-900/90 p-8 border border-slate-700/50 shadow-2xl backdrop-blur-xl z-10"
         >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
           {/* Subtle colored glow effects */}
           <div className="absolute -top-12 -left-12 w-32 h-32 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />

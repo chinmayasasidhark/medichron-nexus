@@ -16,6 +16,10 @@ frontend/.env.local
 backend/.env
 backend/.env.local
 
+# Firebase service account keys
+firebase-service-account.json
+backend/firebase-service-account.json
+
 # IDE & OS
 .vscode/
 .idea/
