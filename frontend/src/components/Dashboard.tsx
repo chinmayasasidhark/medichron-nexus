@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, RefreshCw, Upload, FileText, CheckCircle2, 
+import {
+  ArrowLeft, RefreshCw, Upload, FileText, CheckCircle2,
   Mic, Volume2, ShieldAlert, Sparkles, Plus, Trash2, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
-import { 
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip 
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip
 } from 'recharts';
 import type { TimelineEvent, Medication, MedicalReport } from '../App';
 import { useAuth } from '../context/AuthContext';
@@ -85,7 +85,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const res = await fetch('http://localhost:5000/api/chat', {
+      const res = await fetch('https://medichron-nexus.onrender.com/api/chat', {
         method: 'POST',
         headers,
         body: JSON.stringify({ text: textToSend })
@@ -153,7 +153,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   // Toggle medicine completion
   const handleToggleMedication = async (id: string) => {
     // Optimistic local state update
-    setMedications(prev => 
+    setMedications(prev =>
       prev.map(m => m.id === id ? { ...m, takenToday: !m.takenToday } : m)
     );
 
@@ -162,7 +162,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const res = await fetch(`http://localhost:5000/api/medications/${id}/toggle`, {
+      const res = await fetch(`https://medichron-nexus.onrender.com/api/medications/${id}/toggle`, {
         method: 'POST',
         headers
       });
@@ -172,7 +172,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     } catch (err) {
       console.error('Error toggling medication:', err);
       // Rollback on failure
-      setMedications(prev => 
+      setMedications(prev =>
         prev.map(m => m.id === id ? { ...m, takenToday: !m.takenToday } : m)
       );
     }
@@ -182,7 +182,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const handleAddReminder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reminderMedicine || !reminderDosage) return;
-    
+
     const tempId = `med-temp-${Date.now()}`;
     const newMed: Medication = {
       id: tempId,
@@ -194,7 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
     // Optimistic local state update
     setMedications(prev => [...prev, newMed]);
-    
+
     const originalName = reminderMedicine;
     const originalDosage = reminderDosage;
     const originalTime = reminderTime;
@@ -210,7 +210,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const res = await fetch('http://localhost:5000/api/medications', {
+      const res = await fetch('https://medichron-nexus.onrender.com/api/medications', {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -232,7 +232,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   // Delete medication reminder
   const handleDeleteMedication = async (id: string) => {
     const originalMeds = [...medications];
-    
+
     // Optimistic local state update
     setMedications(prev => prev.filter(m => m.id !== id));
 
@@ -241,7 +241,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const res = await fetch(`http://localhost:5000/api/medications/${id}`, {
+      const res = await fetch(`https://medichron-nexus.onrender.com/api/medications/${id}`, {
         method: 'DELETE',
         headers
       });
@@ -273,7 +273,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Header Bar */}
       <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-200 sticky top-0 bg-brand-darker/95 backdrop-blur-md z-50">
         <div className="flex items-center gap-3">
-          <motion.button 
+          <motion.button
             onClick={onExitApp}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -293,21 +293,20 @@ const Dashboard: React.FC<DashboardProps> = ({
         {/* Tab Navigation */}
         <div className="flex flex-wrap items-center gap-2 bg-white/40 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 shadow-sm">
           {['dashboard', 'timeline', 'chat', 'compare', 'reminders'].map((tab) => (
-            <button 
+            <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer capitalize ${
-                activeTab === tab 
-                  ? 'bg-brand-secondary text-white shadow-sm' 
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer capitalize ${activeTab === tab
+                  ? 'bg-brand-secondary text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/30'
-              }`}
+                }`}
             >
               {tab === 'chat' ? 'Ask AI' : tab === 'compare' ? 'Compare' : tab}
             </button>
           ))}
         </div>
 
-        <motion.button 
+        <motion.button
           onClick={onReset}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -322,7 +321,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       <main className="flex-1 py-8">
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' && (
-            <motion.div 
+            <motion.div
               key="dashboard"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -330,12 +329,12 @@ const Dashboard: React.FC<DashboardProps> = ({
               transition={{ duration: 0.25 }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
             >
-              
+
               {/* Left Main Dashboard Grid */}
               <div className="lg:col-span-8 space-y-8">
-                
+
                 {/* Health Score & Circular Visualizer */}
-                <motion.div 
+                <motion.div
                   className="glass-panel p-6 rounded-3xl"
                   whileHover={{ y: -2 }}
                   transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
@@ -358,8 +357,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                       <AreaChart data={scoreData}>
                         <defs>
                           <linearGradient id="scoreColor" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#14B8A6" stopOpacity={0.25}/>
-                            <stop offset="95%" stopColor="#14B8A6" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#14B8A6" stopOpacity={0.25} />
+                            <stop offset="95%" stopColor="#14B8A6" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <XAxis dataKey="name" stroke="#64748B" fontSize={10} tickLine={false} axisLine={false} />
@@ -372,18 +371,18 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </motion.div>
 
                 {/* Upload New Document Dropzone */}
-                <motion.div 
+                <motion.div
                   className="glass-panel p-6 rounded-3xl"
                   whileHover={{ y: -2 }}
                   transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
                 >
                   <h3 className="text-base font-bold text-slate-900 mb-4">Add Medical Record</h3>
                   <div className="border border-dashed border-slate-200/80 hover:border-brand-secondary/50 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all bg-white/30 backdrop-blur-sm">
-                    <input 
-                      type="file" 
-                      id="dashboard-file-upload" 
-                      className="hidden" 
-                      accept=".pdf,.png,.jpg,.jpeg" 
+                    <input
+                      type="file"
+                      id="dashboard-file-upload"
+                      className="hidden"
+                      accept=".pdf,.png,.jpg,.jpeg"
                       onChange={handleFileUpload}
                     />
                     <label htmlFor="dashboard-file-upload" className="cursor-pointer flex flex-col items-center">
@@ -398,7 +397,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <h4 className="text-xs font-bold uppercase text-slate-500 tracking-wider">Loaded Medical Documents ({reports.length})</h4>
                     <div className="space-y-3">
                       {reports.map((report) => (
-                        <motion.div 
+                        <motion.div
                           key={report.id}
                           layoutId={report.id}
                           className="flex items-center justify-between p-3.5 bg-white/40 border border-slate-200/40 rounded-2xl text-xs"
@@ -411,13 +410,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              report.status === 'Parsed' 
-                                ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600' 
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${report.status === 'Parsed'
+                                ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600'
                                 : report.status === 'Processing'
-                                ? 'bg-amber-500/10 border border-amber-500/20 text-amber-600 animate-pulse'
-                                : 'bg-red-500/10 border border-red-500/20 text-red-600'
-                            }`}>
+                                  ? 'bg-amber-500/10 border border-amber-500/20 text-amber-600 animate-pulse'
+                                  : 'bg-red-500/10 border border-red-500/20 text-red-600'
+                              }`}>
                               {report.status}
                             </span>
                             {report.healthScoreEffect > 0 && (
@@ -434,9 +432,9 @@ const Dashboard: React.FC<DashboardProps> = ({
 
               {/* Right Side Widgets panel */}
               <div className="lg:col-span-4 space-y-8">
-                
+
                 {/* AI Clinical Insights card */}
-                <motion.div 
+                <motion.div
                   className="glass-panel p-6 rounded-3xl"
                   whileHover={{ y: -2 }}
                   transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
@@ -459,7 +457,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </motion.div>
 
                 {/* Conditions list */}
-                <motion.div 
+                <motion.div
                   className="glass-panel p-6 rounded-3xl"
                   whileHover={{ y: -2 }}
                   transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
@@ -467,13 +465,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <h3 className="text-sm font-bold text-slate-900 mb-4">Clinical Conditions</h3>
                   <div className="flex flex-wrap gap-2">
                     {conditions.map((cond, idx) => (
-                      <span 
-                        key={idx} 
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
-                          cond.includes('Resolved') 
-                            ? 'bg-slate-100 border border-slate-200 text-slate-500' 
+                      <span
+                        key={idx}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${cond.includes('Resolved')
+                            ? 'bg-slate-100 border border-slate-200 text-slate-500'
                             : 'bg-brand-accent/10 border border-brand-accent/20 text-brand-accent'
-                        }`}
+                          }`}
                       >
                         {cond}
                       </span>
@@ -482,7 +479,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </motion.div>
 
                 {/* Allergies list */}
-                <motion.div 
+                <motion.div
                   className="glass-panel p-6 rounded-3xl"
                   whileHover={{ y: -2 }}
                   transition={{ type: 'spring' as const, stiffness: 300, damping: 20 }}
@@ -490,7 +487,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <h3 className="text-sm font-bold text-slate-900 mb-4">Allergy Graph</h3>
                   <div className="space-y-2">
                     {allergies.map((allergy, idx) => (
-                      <div 
+                      <div
                         key={idx}
                         className="flex items-center gap-2 p-2.5 bg-white/40 rounded-xl border border-slate-200/40 text-xs shadow-sm"
                       >
@@ -507,7 +504,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           )}
 
           {activeTab === 'timeline' && (
-            <motion.div 
+            <motion.div
               key="timeline"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -522,14 +519,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {['all', 'condition', 'medication', 'allergy'].map((cat) => (
-                    <button 
+                    <button
                       key={cat}
                       onClick={() => setFilterCategory(cat)}
-                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                        filterCategory === cat 
-                          ? 'bg-brand-secondary text-white' 
+                      className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${filterCategory === cat
+                          ? 'bg-brand-secondary text-white'
                           : 'bg-white/60 text-slate-600 hover:text-slate-900 border border-slate-200/60'
-                      }`}
+                        }`}
                     >
                       {cat}
                     </button>
@@ -540,8 +536,8 @@ const Dashboard: React.FC<DashboardProps> = ({
               {/* Vertical timeline with sequential entry animation */}
               <div className="relative border-l border-slate-200 pl-6 space-y-8 ml-3">
                 {filteredEvents.map((ev, idx) => (
-                  <motion.div 
-                    key={ev.id} 
+                  <motion.div
+                    key={ev.id}
                     className="relative group"
                     initial={{ opacity: 0, x: -15 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -549,20 +545,18 @@ const Dashboard: React.FC<DashboardProps> = ({
                     transition={{ delay: idx * 0.08, type: 'spring' as const, stiffness: 90 }}
                   >
                     {/* Circular icon pointer */}
-                    <span className={`absolute -left-[31px] top-1.5 w-4.5 h-4.5 rounded-full border-2 border-brand-dark flex items-center justify-center ${
-                      ev.category === 'condition' ? 'bg-brand-accent' :
-                      ev.category === 'medication' ? 'bg-brand-secondary' : 'bg-orange-500'
-                    }`}></span>
-                    
+                    <span className={`absolute -left-[31px] top-1.5 w-4.5 h-4.5 rounded-full border-2 border-brand-dark flex items-center justify-center ${ev.category === 'condition' ? 'bg-brand-accent' :
+                        ev.category === 'medication' ? 'bg-brand-secondary' : 'bg-orange-500'
+                      }`}></span>
+
                     <div className="space-y-1">
                       <span className="text-[10px] font-bold text-brand-secondary uppercase tracking-widest">{ev.date}</span>
                       <h4 className="text-sm font-bold text-slate-900 group-hover:text-brand-secondary transition-colors">{ev.title}</h4>
                       <p className="text-xs text-slate-600 leading-relaxed">{ev.description}</p>
-                      <span className={`inline-block mt-2 px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase ${
-                        ev.category === 'condition' ? 'bg-brand-accent/10 border border-brand-accent/20 text-brand-accent' :
-                        ev.category === 'medication' ? 'bg-brand-secondary/10 border border-brand-secondary/20 text-brand-secondary' :
-                        'bg-slate-100 border border-slate-200 text-slate-500'
-                      }`}>
+                      <span className={`inline-block mt-2 px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase ${ev.category === 'condition' ? 'bg-brand-accent/10 border border-brand-accent/20 text-brand-accent' :
+                          ev.category === 'medication' ? 'bg-brand-secondary/10 border border-brand-secondary/20 text-brand-secondary' :
+                            'bg-slate-100 border border-slate-200 text-slate-500'
+                        }`}>
                         {ev.category}
                       </span>
                     </div>
@@ -576,7 +570,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           )}
 
           {activeTab === 'chat' && (
-            <motion.div 
+            <motion.div
               key="chat"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -584,14 +578,14 @@ const Dashboard: React.FC<DashboardProps> = ({
               transition={{ duration: 0.25 }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-5xl mx-auto h-[600px]"
             >
-              
+
               {/* Suggested Prompt Sidebar */}
               <div className="lg:col-span-4 flex flex-col justify-between p-6 glass-panel rounded-3xl border border-brand-border">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 mb-4">Preset Medical Inquiries</h3>
                   <div className="space-y-3">
                     {["Summarize my medical history.", "When was I diagnosed with asthma?", "Compare my last two reports.", "What medicines am I currently taking?"].map((prompt, idx) => (
-                      <motion.button 
+                      <motion.button
                         key={idx}
                         onClick={() => handleSendMessage(prompt)}
                         whileHover={{ scale: 1.02, y: -1, boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}
@@ -618,23 +612,22 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
                   <AnimatePresence initial={false}>
                     {chatHistory.map((msg, idx) => (
-                      <motion.div 
+                      <motion.div
                         key={idx}
                         className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                         initial={{ opacity: 0, y: 15, scale: 0.96 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ type: 'spring' as const, stiffness: 100, damping: 14 }}
                       >
-                        <div className={`max-w-[80%] p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm ${
-                          msg.sender === 'user' 
-                            ? 'bg-brand-secondary text-white rounded-tr-none' 
+                        <div className={`max-w-[80%] p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm ${msg.sender === 'user'
+                            ? 'bg-brand-secondary text-white rounded-tr-none'
                             : 'bg-white/60 border border-white/50 backdrop-blur-md text-slate-800 rounded-tl-none'
-                        }`}>
+                          }`}>
                           <p>{msg.text}</p>
-                          
+
                           {/* Audio listen helper for AI text */}
                           {msg.sender === 'ai' && (
-                            <button 
+                            <button
                               onClick={() => speakText(msg.text)}
                               className="mt-2.5 flex items-center gap-1 text-[9px] font-bold text-brand-secondary hover:underline cursor-pointer"
                             >
@@ -654,27 +647,26 @@ const Dashboard: React.FC<DashboardProps> = ({
                       <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary animate-bounce delay-200"></span>
                     </div>
                   )}
-                  
+
                   <div ref={chatEndRef} />
                 </div>
 
                 {/* Chat Input fields */}
                 <div className="p-4 bg-white/30 backdrop-blur-md border-t border-slate-200 flex items-center gap-3">
                   {/* Voice mic toggle */}
-                  <motion.button 
+                  <motion.button
                     onClick={startSpeechRecognition}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`p-2.5 rounded-xl border transition-colors cursor-pointer shadow-sm ${
-                      isListening ? 'bg-red-500/20 text-red-500 animate-pulse border-red-500/40' : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200'
-                    }`}
+                    className={`p-2.5 rounded-xl border transition-colors cursor-pointer shadow-sm ${isListening ? 'bg-red-500/20 text-red-500 animate-pulse border-red-500/40' : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200'
+                      }`}
                     title="Speak using Mic"
                   >
                     <Mic className="w-4 h-4" />
                   </motion.button>
 
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -684,7 +676,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     className="flex-1 bg-white/60 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-brand-secondary transition-colors shadow-inner"
                   />
 
-                  <motion.button 
+                  <motion.button
                     onClick={() => handleSendMessage(chatInput)}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
@@ -700,7 +692,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           )}
 
           {activeTab === 'compare' && (
-            <motion.div 
+            <motion.div
               key="compare"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -714,7 +706,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <motion.div 
+                <motion.div
                   whileHover={{ y: -2 }}
                   className="p-4 bg-white/40 border border-white/65 rounded-2xl flex flex-col justify-between shadow-sm"
                 >
@@ -735,7 +727,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   whileHover={{ y: -2 }}
                   className="p-4 bg-white/40 border border-white/65 rounded-2xl flex flex-col justify-between shadow-sm"
                 >
@@ -760,7 +752,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               {/* Differential parameters grid */}
               <div className="pt-4 space-y-3">
                 <h4 className="text-xs font-bold uppercase text-slate-500 tracking-wider">Parameters Overview</h4>
-                
+
                 <div className="flex items-center justify-between p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs">
                   <div className="flex items-center gap-2">
                     <ArrowUpRight className="w-4.5 h-4.5 text-emerald-600" />
@@ -789,7 +781,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           )}
 
           {activeTab === 'reminders' && (
-            <motion.div 
+            <motion.div
               key="reminders"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -797,7 +789,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               transition={{ duration: 0.25 }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-5xl mx-auto"
             >
-              
+
               {/* Reminders List pane with layout animations */}
               <div className="lg:col-span-7 glass-panel p-6 rounded-3xl space-y-6">
                 <div>
@@ -808,27 +800,25 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="space-y-3">
                   <AnimatePresence initial={false}>
                     {medications.map((med) => (
-                      <motion.div 
+                      <motion.div
                         key={med.id}
                         layout
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ type: 'spring' as const, stiffness: 100, damping: 15 }}
-                        className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
-                          med.takenToday 
-                            ? 'bg-emerald-500/5 border-emerald-500/15 text-slate-500' 
+                        className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${med.takenToday
+                            ? 'bg-emerald-500/5 border-emerald-500/15 text-slate-500'
                             : 'bg-white/40 border-slate-200/60 text-slate-700 shadow-sm'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-3">
-                          <button 
+                          <button
                             onClick={() => handleToggleMedication(med.id)}
-                            className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors cursor-pointer ${
-                              med.takenToday 
-                                ? 'bg-emerald-500 border-emerald-500 text-white' 
+                            className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors cursor-pointer ${med.takenToday
+                                ? 'bg-emerald-500 border-emerald-500 text-white'
                                 : 'border-slate-300 hover:border-brand-secondary bg-white'
-                            }`}
+                              }`}
                           >
                             {med.takenToday && <span className="text-[10px]">✔</span>}
                           </button>
@@ -837,8 +827,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <p className="text-[10px] text-slate-500">{med.dosage} • {med.time}</p>
                           </div>
                         </div>
-                        
-                        <button 
+
+                        <button
                           onClick={() => handleDeleteMedication(med.id)}
                           className="p-1.5 rounded-lg text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
                           title="Delete Reminder"
@@ -854,11 +844,11 @@ const Dashboard: React.FC<DashboardProps> = ({
               {/* Add Custom Reminder Form */}
               <div className="lg:col-span-5 glass-panel p-6 rounded-3xl space-y-6">
                 <h3 className="text-sm font-bold text-slate-900">Create New Pill Alert</h3>
-                
+
                 <form onSubmit={handleAddReminder} className="space-y-4">
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Medicine Name</label>
-                    <input 
+                    <input
                       type="text"
                       required
                       value={reminderMedicine}
@@ -871,7 +861,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Dosage</label>
-                      <input 
+                      <input
                         type="text"
                         required
                         value={reminderDosage}
@@ -882,7 +872,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Frequency/Time</label>
-                      <input 
+                      <input
                         type="text"
                         value={reminderTime}
                         onChange={(e) => setReminderTime(e.target.value)}
@@ -892,7 +882,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                   </div>
 
-                  <motion.button 
+                  <motion.button
                     type="submit"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
